@@ -49,7 +49,7 @@ if [ "${DISPLAYSERVER}" = "x11" ]; then
   PKG_MESON_OPTS_TARGET+=" -Dplatforms=x11 \
                            -Dglx=dri"
   if [ "${DEVICE}" = "Odin" ]; then
-     PKG_MESON_OPTS_TARGET+=" -Dglx-direct=enabled"
+     PKG_MESON_OPTS_TARGET+=" -Dglx-direct=true"
   fi
   if [ "${PROJECT}" = "L4T" ]; then
     PKG_DEPENDS_TARGET+=" libglvnd"
