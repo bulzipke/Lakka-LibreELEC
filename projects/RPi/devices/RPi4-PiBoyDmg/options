@@ -34,3 +34,6 @@
 
   # Kernel target
     KERNEL_TARGET="Image"
+
+  # override default linux, not compatible with xpi_gamecon driver/module
+    LINUX="raspberrypi-6.6.y"
