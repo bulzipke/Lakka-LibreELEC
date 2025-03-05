@@ -40,6 +40,8 @@ PKG_CONFIGURE_OPTS_TARGET="BASH_SHELL=/bin/sh \
 
 if [ "${PROJECT}" = "Ayn" ]; then
   PKG_CONFIGURE_OPTS_TARGET="${PKG_CONFIGURE_OPTS_TARGET//--enable-kernel=6.12.0/--enable-kernel=5.19.0/}"
+elif [ "${PROJECT}" = "RPi" -a "${DEVICE}" = "RPi4-PiBoyDmg" ]; then
+  PKG_CONFIGURE_OPTS_TARGET="${PKG_CONFIGURE_OPTS_TARGET//--enable-kernel=6.12.0/--enable-kernel=6.6.0/}"
 fi
 
 if build_with_debug; then
