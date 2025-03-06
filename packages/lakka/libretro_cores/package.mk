@@ -201,94 +201,116 @@ fi
 
 # disable cores based on PROJECT/DEVICE
 if [ "${PROJECT}" = "Allwinner" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" boom3 lr_moonlight vitaquake3"
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
+                            vitaquake3"
+
 elif [ "${PROJECT}" = "Amlogic" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" boom3 lr_moonlight panda3ds vitaquake3"
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
+                            vitaquake3"
+
 elif [ "${PROJECT}" = "Ayn" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" boom3 lr_moonlight vitaquake3"
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
+                            vitaquake3"
+
 elif [ "${PROJECT}" = "Generic" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" boom3 lr_moonlight vitaquake3"
-  if [ "${ARCH}" = "i386" ]; then
-    EXCLUDE_LIBRETRO_CORES+=" fake_08 kronos openlara"
-  fi
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
+			    vitaquake3"
+
 elif [ "${PROJECT}" = "L4T" ]; then
-  # lr_moonlight does not currently build for Switch because of newer OpenSSL package. (older package is not compatible with ffmpeg)
-  # mame requires gcc >= 10.3
-  # Stella Doesnt Build.
-  EXCLUDE_LIBRETRO_CORES+=" stella holani lr_moonlight"
+  EXCLUDE_LIBRETRO_CORES+=" citra \
+                            lr_moonlight \
+                            mame \
+                            melondsds \
+                            np2kai \
+                            panda3ds \
+                            stella"
+
 elif [ "${PROJECT}" = "NXP" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" boom3 lr_moonlight vitaquake3"
-  if [ "${DEVICE}" = "iMX8" ]; then
-    EXCLUDE_LIBRETRO_CORES+=" panda3ds"
-  fi
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
+                            vitaquake3"
+
 elif [ "${PROJECT}" = "Rockchip" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" boom3 lr_moonlight vitaquake3"
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
+                            vitaquake3"
+
 elif [ "${PROJECT}" = "RPi" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" boom3 lr_moonlight vitaquake3"
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
+                            vitaquake3"
+
   if [ "${DEVICE}" = "RPi" -o "${DEVICE}" = "RPiZero-GPiCase" ]; then
-    EXCLUDE_LIBRETRO_CORES+="\
-                             beetle_bsnes \
-                             beetle_psx \
-                             beetle_saturn \
-                             beetle_vb \
-                             bk_emulator \
-                             bsnes \
-                             bsnes2014 \
-                             bsnes_hd \
-                             bsnes_mercury \
-                             citra \
-                             desmume \
-                             desmume_2015 \
-                             dolphin \
-                             dosbox \
-                             dosbox_core \
-                             dosbox_pure \
-                             dosbox_svn \
-                             fbneo \
-                             flycast \
-                             genesis_plus_gx \
-                             higan_sfc \
-                             higan_sfc_balanced \
-                             mame \
-                             mame2003_plus \
-                             mame2010 \
-                             mame2015 \
-                             melonds \
-                             melondsds \
-                             meowpc98 \
-                             mesen \
-                             mesen_s \
-                             mupen64plus_next \
-                             openlara \
-                             opera \
-                             panda3ds \
-                             parallel_n64 \
-                             play \
-                             ppsspp \
-                             puae \
-                             same_cdi \
-                             snes9x \
-                             snes9x2005_plus \
-                             snes9x2010 \
-                             swanstation \
-                             uae4arm \
-                             vbam \
-                             virtualjaguar \
-                             vircon32 \
-                             vitaquake2 \
-                             yabasanshiro \
-                             yabause \
-                            "
+    EXCLUDE_LIBRETRO_CORES+=" beetle_bsnes \
+                              beetle_psx \
+                              beetle_saturn \
+                              beetle_vb \
+                              bk_emulator \
+                              boom3 \
+                              bsnes \
+                              bsnes2014 \
+                              bsnes_hd \
+                              bsnes_mercury \
+                              desmume \
+                              desmume_2015 \
+                              dolphin \
+                              dosbox \
+                              dosbox_core \
+                              dosbox_pure \
+                              dosbox_svn \
+                              fbneo \
+                              flycast \
+                              genesis_plus_gx \
+                              higan_sfc \
+                              higan_sfc_balanced \
+                              mame \
+                              mame2003_plus \
+                              mame2010 \
+                              mame2015 \
+                              melonds \
+                              melondsds \
+                              meowpc98 \
+                              mesen \
+                              mesen_s \
+                              mupen64plus_next \
+                              openlara \
+                              opera \
+                              parallel_n64 \
+                              play \
+                              ppsspp \
+                              puae \
+                              same_cdi \
+                              snes9x \
+                              snes9x2005_plus \
+                              snes9x2010 \
+                              swanstation \
+                              uae4arm \
+                              vbam \
+                              virtualjaguar \
+                              vircon32 \
+                              vitaquake2 \
+                              yabasanshiro \
+                              yabause"
+
   elif [ "${DEVICE}" = "RPi2" ]; then
     EXCLUDE_LIBRETRO_CORES+=" play"
+
   elif [ "${DEVICE}" = "RPiZero2-GPiCase" ]; then
-    EXCLUDE_LIBRETRO_CORES+=" openlara play ppsspp vircon32 swanstation yabasanshiro"
+    EXCLUDE_LIBRETRO_CORES+=" boom3 \
+                              openlara \
+                              play \
+                              ppsspp \
+                              vircon32 \
+                              swanstation \
+                              yabasanshiro"
   fi
-  if [ "${DEVICE}" != "RPi5" ]; then
-    EXCLUDE_LIBRETRO_CORES+=" panda3ds"
-  fi
+
 elif [ "${PROJECT}" = "Samsung" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" boom3 lr_moonlight vitaquake3"
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
+                            vitaquake3"
+fi
+
+# disable cores that require rust until rust:host works for arm and i386
+if [ "${TARGET_ARCH}" = "arm" -o "${TARGET_ARCH}" = "i386" ]; then
+  EXCLUDE_LIBRETRO_CORES+=" doukutsu_rs \
+                            holani"
 fi
 
 # exclude some cores at build time via env EXCLUDE_LIBRETRO_CORES="core1 core2"
@@ -299,12 +321,10 @@ if [ -n "${EXCLUDE_LIBRETRO_CORES}" ]; then
   done
 fi
 
-# temporary disabled due to build error with gcc14  for all targets except Switch (uses older gcc)
-if [ ! "${PROJECT}" = "L4T" -a ! "${DEVICE}" = "Switch" ]; then
-  for core in citra np2kai ; do
-    LIBRETRO_CORES="${LIBRETRO_CORES// ${core} /}"
-  done
-fi
+# temporary disabled due to build error
+for core in np2kai ; do
+  LIBRETRO_CORES="${LIBRETRO_CORES// ${core} /}"
+done
 
 # finally set package dependencies
 PKG_DEPENDS_TARGET="${LIBRETRO_CORES}"
