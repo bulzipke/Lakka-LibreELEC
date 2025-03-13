@@ -26,7 +26,7 @@ COUNTRY=""
 
 [ -f ${wifi_cfg} ] && . ${wifi_cfg}
 
-if [ -n "${SSID}" -a -n ${PSK} ]; then
+if [ -n "${SSID}" -a -n "${PSK}" ]; then
   cat << EOF >>${auto_script}
 
 wifilog=/storage/autostart-wifi-config.log
