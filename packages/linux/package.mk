@@ -5,8 +5,8 @@
 PKG_NAME="linux"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kernel.org"
-PKG_DEPENDS_HOST="ccache:host rsync:host"
-PKG_DEPENDS_TARGET="linux:host kmod:host xz:host keyutils openssl:host ${KERNEL_EXTRA_DEPENDS_TARGET}"
+PKG_DEPENDS_HOST="ccache:host"
+PKG_DEPENDS_TARGET="linux:host kmod:host keyutils openssl:host ${KERNEL_EXTRA_DEPENDS_TARGET}"
 PKG_NEED_UNPACK="${LINUX_DEPENDS} $(get_pkg_directory initramfs) $(get_pkg_variable initramfs PKG_NEED_UNPACK)"
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
 PKG_IS_KERNEL_PKG="yes"
@@ -16,17 +16,18 @@ PKG_PATCH_DIRS="${LINUX}"
 
 case "${LINUX}" in
   amlogic)
-    PKG_VERSION="e8f897f4afef0031fe618a8e94127a0934896aba" # 6.8.0
-    PKG_SHA256="52608771cc42196f0a7a71a93270a27ca5f7ba1d9280fb398e521b0620a7a3ac"
+    PKG_VERSION="86731a2a651e58953fc949573895f2fa6d456841" # 6.16-rc3
+    PKG_SHA256="008b00968a8bfc0627580b82a2d30c7304336a4f92a58e80cdbc2d4723e01840"
     PKG_URL="https://github.com/torvalds/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
     PKG_PATCH_DIRS="default"
     ;;
   raspberrypi)
-    PKG_VERSION="bba53a117a4a5c29da892962332ff1605990e17a" # 6.6.78
-    PKG_SHA256="901dbc05b56e519d1f0beaefa83dac4a8d915e5b5f85190fd1adda640c345287"
+    PKG_VERSION="5a72e3ae00ecdd02244e867c2880a3ac0653ee25" # 6.12.40
+    PKG_SHA256="ef92cb35db68978a76f527988a11046c8598d2a512a03de67c8cde5467ddcecb"
     PKG_URL="https://github.com/raspberrypi/linux/archive/${PKG_VERSION}.tar.gz"
     PKG_SOURCE_NAME="linux-${LINUX}-${PKG_VERSION}.tar.gz"
+    PKG_PATCH_DIRS="raspberrypi rtlwifi/6.13 rtlwifi/6.14 rtlwifi/6.15"
     ;;
   L4T)
     if [ -z "${L4T_KERNEL_VERSION}" ]; then
@@ -54,8 +55,8 @@ case "${LINUX}" in
    PKG_GIT_CLONE_BRANCH="sdm845-5.19.16"
    ;;
   *)
-    PKG_VERSION="6.6.71"
-    PKG_SHA256="219715ba2dcfa6539fba09ad3f9212772f3507189eb60d77f8e89b06c32e724e"
+    PKG_VERSION="6.16"
+    PKG_SHA256="1a4be2fe6b5246aa4ac8987a8a4af34c42a8dd7d08b46ab48516bcc1befbcd83"
     PKG_URL="https://www.kernel.org/pub/linux/kernel/v${PKG_VERSION/.*/}.x/${PKG_NAME}-${PKG_VERSION}.tar.xz"
     PKG_PATCH_DIRS="default"
     ;;
@@ -86,6 +87,10 @@ fi
 
 if [[ "${KERNEL_TARGET}" = uImage* ]]; then
   PKG_DEPENDS_TARGET+=" u-boot-tools:host"
+fi
+
+if [ "${BOOTLOADER}" = "bcm2835-bootloader" -a "${TARGET_KERNEL_ARCH}" = "arm64" ]; then
+  PKG_DEPENDS_TARGET+=" pigz:host"
 fi
 
 # Ensure that the dependencies of initramfs:target are built correctly, but
@@ -162,12 +167,6 @@ pre_make_target() {
   ${PKG_BUILD}/scripts/config ${OPTION} CONFIG_ISCSI_BOOT_SYSFS
   ${PKG_BUILD}/scripts/config ${OPTION} CONFIG_ISCSI_IBFT_FIND
   ${PKG_BUILD}/scripts/config ${OPTION} CONFIG_ISCSI_IBFT
-
-  # disable lima/panfrost if libmali is configured
-  if [ "${OPENGLES}" = "libmali" ]; then
-    ${PKG_BUILD}/scripts/config --disable CONFIG_DRM_LIMA
-    ${PKG_BUILD}/scripts/config --disable CONFIG_DRM_PANFROST
-  fi
 
   # disable wireguard support if not enabled
   if [ ! "${WIREGUARD_SUPPORT}" = yes ]; then
@@ -411,23 +410,31 @@ make_target() {
             ;;
         esac
 
-        WERROR=0 \
-        NO_LIBPERL=1 \
-        NO_LIBPYTHON=1 \
-        NO_SLANG=1 \
-        NO_GTK2=1 \
-        NO_LIBNUMA=1 \
-        NO_LIBAUDIT=1 \
-        NO_LIBTRACEEVENT=1 \
-        NO_LZMA=1 \
-        NO_SDT=1 \
-        CROSS_COMPILE="${TARGET_PREFIX}" \
-        JOBS="${CONCURRENCY_MAKE_LEVEL}" \
-          make ${PERF_BUILD_ARGS}
-        mkdir -p ${INSTALL}/usr/bin
-          cp perf ${INSTALL}/usr/bin
-      )
-    fi
+      WERROR=0 \
+      NO_LIBPERL=1 \
+      NO_LIBPYTHON=1 \
+      NO_SLANG=1 \
+      NO_GTK2=1 \
+      NO_LIBNUMA=1 \
+      NO_LIBAUDIT=1 \
+      NO_LIBTRACEEVENT=1 \
+      NO_LZMA=1 \
+      NO_SDT=1 \
+      NO_LIBDEBUGINFOD=1 \
+      NO_JVMTI=1 \
+      NO_LIBLLVM=1 \
+      NO_LIBPFM4=1 \
+      NO_LIBBABELTRACE=1 \
+      NO_CAPSTONE=1 \
+      NO_LIBPFM4=1 \
+      BUILD_BPF_SKEL=0 \
+      CROSS_COMPILE="${TARGET_PREFIX}" \
+      JOBS="${CONCURRENCY_MAKE_LEVEL}" \
+        make ${PERF_BUILD_ARGS}
+      mkdir -p ${INSTALL}/usr/bin
+        cp perf ${INSTALL}/usr/bin
+    )
+   fi
   fi
 
   if [ -n "${KERNEL_UIMAGE_TARGET}" ]; then

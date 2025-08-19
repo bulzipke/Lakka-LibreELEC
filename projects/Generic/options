@@ -73,6 +73,7 @@
   # for a list of additional drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS+=" DRIVER1 DRIVER2"
+<<<<<<< HEAD
     ADDITIONAL_DRIVERS+=" bcm_sta"
 
   # build and install driver addons (yes / no)
@@ -86,6 +87,14 @@
   # for a list of additional drivers see packages/linux-driver-addons
   # Space separated list is supported,
     DRIVER_ADDONS="crazycat digital_devices dvb-latest"
+=======
+    ADDITIONAL_DRIVERS+=""
+>>>>>>> 0a5c6bd7eafbdbd879c0f8a70c96c6b2f7d852b5
 
   # Default size of the ova image, in MB, eg. 4096
     OVA_SIZE="4096"
+
+  # ensure system size is at least 1 GB
+    if [ ${SYSTEM_SIZE} -lt 1024 ]; then
+      SYSTEM_SIZE=1024
+    fi

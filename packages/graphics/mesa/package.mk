@@ -3,12 +3,13 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="mesa"
-PKG_VERSION="24.0.9"
-PKG_SHA256="51aa686ca4060e38711a9e8f60c8f1efaa516baf411946ed7f2c265cd582ca4c"
+PKG_VERSION="25.1.8"
+PKG_SHA256="5cf1571d0d646d90047f3d93f57acc787cf88ec7e95efe172c555b492c30fb71"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
 PKG_URL="https://mesa.freedesktop.org/archive/mesa-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_TARGET="toolchain expat libdrm Mako:host"
+PKG_DEPENDS_HOST="toolchain:host expat:host libclc:host libdrm:host Mako:host pyyaml:host spirv-tools:host"
+PKG_DEPENDS_TARGET="toolchain expat libdrm Mako:host pyyaml:host"
 PKG_LONGDESC="Mesa is a 3-D graphics library with an API."
 
 get_graphicdrivers
@@ -17,13 +18,19 @@ if [ "${DEVICE}" = "Dragonboard" ]; then
   PKG_DEPENDS_TARGET+=" libarchive libxml2 lua54"
 fi
 
+PKG_MESON_OPTS_HOST="-Dglvnd=disabled \
+                     -Dgallium-drivers=iris \
+                     -Dgallium-vdpau=disabled \
+                     -Dplatforms= \
+                     -Dglx=disabled \
+                     -Dvulkan-drivers= \
+                     -Dshared-llvm=disabled \
+                     -Dtools=panfrost"
+
 PKG_MESON_OPTS_TARGET="-Dgallium-drivers=${GALLIUM_DRIVERS// /,} \
                        -Dgallium-extra-hud=false \
-                       -Dgallium-omx=disabled \
-                       -Dgallium-nine=false \
-                       -Dgallium-opencl=disabled \
+                       -Dgallium-rusticl=false \
                        -Dshader-cache=enabled \
-                       -Dshared-glapi=enabled \
                        -Dopengl=true \
                        -Dgbm=enabled \
                        -Degl=enabled \
@@ -32,14 +39,12 @@ PKG_MESON_OPTS_TARGET="-Dgallium-drivers=${GALLIUM_DRIVERS// /,} \
                        -Dlmsensors=disabled \
                        -Dbuild-tests=false \
                        -Ddraw-use-llvm=false \
-                       -Dselinux=false \
-                       -Dosmesa=false"
+                       -Dmicrosoft-clc=disabled"
 
 if [ "${DISPLAYSERVER}" = "x11" ]; then
   PKG_DEPENDS_TARGET+=" xorgproto libXext libXdamage libXfixes libXxf86vm libxcb libX11 libxshmfence libXrandr"
   export X11_INCLUDES=
   PKG_MESON_OPTS_TARGET+=" -Dplatforms=x11 \
-                           -Ddri3=enabled \
                            -Dglx=dri"
   if [ "${DEVICE}" = "Odin" ]; then
      PKG_MESON_OPTS_TARGET+=" -Dglx-direct=true"
@@ -51,24 +56,37 @@ if [ "${DISPLAYSERVER}" = "x11" ]; then
 elif [ "${DISPLAYSERVER}" = "wl" ]; then
   PKG_DEPENDS_TARGET+=" wayland wayland-protocols"
   PKG_MESON_OPTS_TARGET+=" -Dplatforms=wayland \
-                           -Ddri3=disabled \
                            -Dglx=disabled"
 elif [ "${DISTRO}" = "Lakka" -o "${PROJECT}" = "L4T" ]; then
   PKG_DEPENDS_TARGET+=" libglvnd"
   PKG_MESON_OPTS_TARGET+=" -Dplatforms="" -Ddri3=enabled -Dglx=disabled -Dglvnd=true"
 else
   PKG_MESON_OPTS_TARGET+=" -Dplatforms="" \
-                           -Ddri3=disabled \
                            -Dglx=disabled"
 fi
 
-if listcontains "${GRAPHIC_DRIVERS}" "(nvidia|nvidia-ng)"; then
+if listcontains "${GRAPHIC_DRIVERS}" "etnaviv"; then
+  PKG_DEPENDS_TARGET+=" pycparser:host"
+fi
+
+if listcontains "${GRAPHIC_DRIVERS}" "(iris|panfrost)"; then
+  if [ "${USE_REUSABLE}" = "yes" ]; then
+    PKG_DEPENDS_TARGET+=" mesa-reusable"
+  else
+    PKG_DEPENDS_TARGET+=" mesa:host"
+  fi
+  PKG_MESON_OPTS_TARGET+=" -Dmesa-clc=system -Dprecomp-compiler=system"
+fi
+
+if listcontains "${GRAPHIC_DRIVERS}" "(nvidia|nvidia-ng)" ||
+              [ "${OPENGL_SUPPORT}" = "yes" -a "${DISPLAYSERVER}" != "x11" ]; then
   PKG_DEPENDS_TARGET+=" libglvnd"
-  PKG_MESON_OPTS_TARGET+=" -Dglvnd=true"
+  PKG_MESON_OPTS_TARGET+=" -Dglvnd=enabled"
 else
   if [ ! "${DISTRO}" = "Lakka" -a ! "${PROJECT}" = "L4T" ]; then
-    PKG_MESON_OPTS_TARGET+=" -Dglvnd=false"
+    PKG_MESON_OPTS_TARGET+=" -Dglvnd=disabled"
   fi
+  PKG_MESON_OPTS_TARGET+=" -Dglvnd=disabled"
 fi
 
 if [ "${LLVM_SUPPORT}" = "yes" ]; then
@@ -88,7 +106,7 @@ fi
 if [ "${VAAPI_SUPPORT}" = "yes" ] && listcontains "${GRAPHIC_DRIVERS}" "(r600|radeonsi)"; then
   PKG_DEPENDS_TARGET+=" libva"
   PKG_MESON_OPTS_TARGET+=" -Dgallium-va=enabled \
-                           -Dvideo-codecs=vc1dec,h264dec,h264enc,h265dec,h265enc"
+                           -Dvideo-codecs=vc1dec,h264dec,h264enc,h265dec,h265enc,av1dec,av1enc,vp9dec"
 else
   PKG_MESON_OPTS_TARGET+=" -Dgallium-va=disabled"
 fi
@@ -106,7 +124,7 @@ else
 fi
 
 if [ "${VULKAN_SUPPORT}" = "yes" ]; then
-  PKG_DEPENDS_TARGET+=" ${VULKAN} vulkan-tools"
+  PKG_DEPENDS_TARGET+=" ${VULKAN} vulkan-tools ply:host"
   PKG_MESON_OPTS_TARGET+=" -Dvulkan-drivers=${VULKAN_DRIVERS_MESA// /,}"
 else
   PKG_MESON_OPTS_TARGET+=" -Dvulkan-drivers="
@@ -121,4 +139,33 @@ post_makeinstall_target() {
   if [ "${PROJECT}" = "L4T" ]; then
     safe_remove ${INSTALL}/usr/lib/libgbm.so.1
   fi
+
+makeinstall_host() {
+  host_files="src/compiler/clc/mesa_clc src/compiler/spirv/vtn_bindgen2 src/panfrost/clc/panfrost_compile"
+
+  if listcontains "${BUILD_REUSABLE}" "(all|mesa:host)"; then
+    # Build the reusable mesa:host for both local and to be added to a GitHub release
+    strip ${host_files}
+    upx --lzma ${host_files}
+
+    REUSABLE_SOURCES="${SOURCES}/mesa-reusable"
+    MESA_HOST="mesa-reusable-${OS_VERSION}-${PKG_VERSION}"
+    REUSABLE_SOURCE_NAME=${MESA_HOST}-${MACHINE_HARDWARE_NAME}.tar
+
+    mkdir -p "${TARGET_IMG}"
+
+    tar cf ${TARGET_IMG}/${REUSABLE_SOURCE_NAME} --transform='s|.*/||' ${host_files}
+    sha256sum ${TARGET_IMG}/${REUSABLE_SOURCE_NAME} | \
+      cut -d" " -f1 >${TARGET_IMG}/${REUSABLE_SOURCE_NAME}.sha256
+
+    if listcontains "${BUILD_REUSABLE}" "save-local"; then
+      mkdir -p "${REUSABLE_SOURCES}"
+      cp -p ${TARGET_IMG}/${REUSABLE_SOURCE_NAME} ${REUSABLE_SOURCES}
+      cp -p ${TARGET_IMG}/${REUSABLE_SOURCE_NAME}.sha256 ${REUSABLE_SOURCES}
+      echo "save-local" >${REUSABLE_SOURCES}/${REUSABLE_SOURCE_NAME}.url
+    fi
+  fi
+
+  mkdir -p "${TOOLCHAIN}/bin"
+    cp -a ${host_files} "${TOOLCHAIN}/bin"
 }

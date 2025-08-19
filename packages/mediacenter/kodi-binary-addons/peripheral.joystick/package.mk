@@ -1,11 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2009-2016 Lukas Rusak (lrusak@libreelec.tv)
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="peripheral.joystick"
 PKG_VERSION="21.1.22-Omega"
 PKG_SHA256="deb7fb41408ff06989b8fa2db7bd5bea210756a1f2f8a9037cc12f6518fddd94"
-PKG_REV="1"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/peripheral.joystick"
@@ -18,10 +17,3 @@ PKG_BUILD_FLAGS="+lto"
 
 PKG_IS_ADDON="embedded"
 PKG_ADDON_TYPE="kodi.peripheral"
-
-post_install() {
-  if [ "${PROJECT}" = "L4T" -a "${DEVICE}" = "Switch" ]; then
-    # Set UDEV controller driver as active
-    sed -i -e 's|<default>0</default>|<default>1</default>|' ${INSTALL}/usr/share/kodi/addons/peripheral.joystick/resources/settings.xml
-  fi
-}
