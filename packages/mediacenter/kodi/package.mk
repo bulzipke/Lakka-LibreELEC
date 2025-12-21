@@ -3,19 +3,13 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="9efd536451dd1a6c5edddff9882aaf312719a87a"
-PKG_SHA256="d28f2f018c5253755bc881c344f88a62d15ab9492cb7b2869604f76ec7a10c53"
+PKG_VERSION="21.3-Omega"
+PKG_SHA256="a60afcb556e4a00cb19fc35b7e77758107c9a8096c6ce9b66af5f92396be31aa"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/xbmc/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host Python3 zlib systemd lzo pcre swig:host libass curl fontconfig fribidi tinyxml tinyxml2 libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid libdvdnav libfmt lirc libfstrcmp flatbuffers:host flatbuffers libudfread spdlog"
 PKG_DEPENDS_UNPACK="commons-lang3 commons-text groovy"
-
-if [ "${PROJECT}" = "L4T" -a "${DEVICE}" = "Switch" ]; then
-  # Not really sure why u-power was removed, this is required to get battery statistics in kodi.
-  PKG_DEPENDS_TARGET+=" upower"
-fi
-
 PKG_DEPENDS_HOST="toolchain"
 PKG_LONGDESC="A free and open source cross-platform media player."
 PKG_BUILD_FLAGS="+speed"
