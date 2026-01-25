@@ -112,6 +112,7 @@ LIBRETRO_CORES="\
                 panda3ds \
                 parallel_n64 \
                 pcsx_rearmed \
+                pd777 \
                 picodrive \
                 play \
                 pocketcdg \
