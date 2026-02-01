@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="xf86-video-nvidia"
-PKG_VERSION="575.64.05"
-PKG_SHA256="f261d894c33cdd64da46c092458ca1e510dd08c0edda7458dd15c786887ccf75"
+PKG_VERSION="590.48.01"
+PKG_SHA256="d57a303ef837d27fa875e871e69a5caacf2a6239bbad2542d179cfb01c0c4ae5"
 PKG_ARCH="x86_64"
 PKG_LICENSE="nonfree"
 PKG_SITE="https://www.nvidia.com/en-us/drivers/unix/"
@@ -114,6 +114,18 @@ makeinstall_target() {
     cp libvdpau_nvidia.so* ${INSTALL}/usr/lib/vdpau/libvdpau_nvidia-main.so.1
     ln -sf /var/lib/libvdpau_nvidia.so ${INSTALL}/usr/lib/vdpau/libvdpau_nvidia.so
     ln -sf /var/lib/libvdpau_nvidia.so.1 ${INSTALL}/usr/lib/vdpau/libvdpau_nvidia.so.1
+
+  # CUDA
+  mkdir -p ${INSTALL}/usr/lib
+    cp -P libcuda.so.${PKG_VERSION}  ${INSTALL}/usr/lib/
+    ln -sf libcuda.so.${PKG_VERSION} ${INSTALL}/usr/lib/libcuda.so.1
+    ln -sf libcuda.so.1              ${INSTALL}/usr/lib/libcuda.so
+
+  # nvcuvid
+  mkdir -p ${INSTALL}/usr/lib
+    cp -P libnvcuvid.so.${PKG_VERSION}  ${INSTALL}/usr/lib/
+    ln -sf libnvcuvid.so.${PKG_VERSION} ${INSTALL}/usr/lib/libnvcuvid.so.1
+    ln -sf libnvcuvid.so.1              ${INSTALL}/usr/lib/libnvcuvid.so
 
   # App profiles
   mkdir -p ${INSTALL}/usr/share/nvidia
