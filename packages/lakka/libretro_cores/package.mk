@@ -226,8 +226,7 @@ elif [ "${PROJECT}" = "Generic" ]; then
   EXCLUDE_LIBRETRO_CORES+=" lr_moonlight"
 
 elif [ "${PROJECT}" = "L4T" ]; then
-  EXCLUDE_LIBRETRO_CORES+=" amiberry \
-                            lr_moonlight \
+  EXCLUDE_LIBRETRO_CORES+=" lr_moonlight \
                             panda3ds"
 
 elif [ "${PROJECT}" = "NXP" ]; then
